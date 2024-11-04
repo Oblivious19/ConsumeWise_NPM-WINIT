@@ -7,20 +7,38 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    
-    // Here, you would usually handle the signup logic (e.g., API call)
-    console.log('User signed up:', { email, password });
-    
-    // Redirect to Login page after successful signup
-    navigate('/login');
+
+    try {
+      const response = await fetch('http://localhost:5000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Handle successful signup
+        console.log('User signed up:', data);
+        navigate('/login'); // Redirect to Login page after successful signup
+      } else {
+        // Handle error response
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('Signup failed. Please try again.');
+    }
   };
 
   return (

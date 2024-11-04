@@ -6,12 +6,34 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Here, you would usually handle the login logic (e.g., API call)
-    console.log('User logged in:', { email, password });
-    // Redirect to Questionnaire page or wherever after login
-    navigate('/questionnaire');
+    
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Handle successful login
+        console.log('User logged in:', data);
+        // You might want to save the token in local storage
+        localStorage.setItem('token', data.token);
+        navigate('/questionnaire'); // Redirect to Questionnaire page
+      } else {
+        // Handle error response
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Login failed. Please try again.');
+    }
   };
 
   return (
